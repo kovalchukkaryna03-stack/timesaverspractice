@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vocabulary & Speaking Practice</title>
+<style>
+:root{--ink:#20263a;--muted:#657087;--blue:#315b91;--blue2:#eaf1fa;--gold:#d5a94f;--line:#dce2eb;--bg:#f5f7fb;--white:#fff;--green:#24734d;--red:#b54444}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+header{background:linear-gradient(120deg,#203b62,#416c9c);color:#fff;padding:38px 20px 32px}
+.wrap{max-width:900px;margin:auto;padding:0 18px}
+.eyebrow{text-transform:uppercase;letter-spacing:.13em;font-size:.76rem;font-weight:700;color:#e8cf91}
+h1{font-size:clamp(1.8rem,4vw,2.7rem);line-height:1.12;margin:8px 0}
+header p{margin:10px 0 0;color:#e9eef6;max-width:680px}
+main{padding:26px 0 60px}
+.progressbox,.section,.results{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:22px;margin:0 0 18px;box-shadow:0 5px 18px rgba(30,50,80,.04)}
+.progressrow{display:flex;justify-content:space-between;gap:12px;color:var(--muted);font-size:.9rem}
+.track{height:8px;background:#edf0f5;border-radius:9px;margin-top:10px;overflow:hidden}
+#progress{height:100%;width:0;background:var(--gold);transition:width .2s}
+h2{font-size:1.22rem;margin:0 0 5px;color:var(--blue)}
+.instruction{color:var(--muted);margin:0 0 18px}
+.q{padding:15px 0;border-top:1px solid #edf0f4}
+.q:first-of-type{border-top:0}
+.prompt{font-weight:600;margin-bottom:9px}
+.options{display:flex;flex-wrap:wrap;gap:8px}
+label.choice{border:1px solid var(--line);padding:8px 12px;border-radius:9px;cursor:pointer;background:#fff}
+label.choice:has(input:checked){border-color:var(--blue);background:var(--blue2)}
+input[type=radio]{accent-color:var(--blue);margin-right:6px}
+input.text, select{border:1px solid #cbd4e0;border-radius:8px;padding:9px 10px;font:inherit;color:var(--ink);max-width:100%;background:#fff}
+input.text{min-width:170px;width:min(100%,300px)}
+select{min-width:180px}
+.feedback{font-size:.9rem;margin-top:7px;min-height:1.3em}
+.correct{color:var(--green);font-weight:650}
+.incorrect{color:var(--red);font-weight:650}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+button{border:0;border-radius:10px;padding:11px 17px;font:inherit;font-weight:650;cursor:pointer}
+.primary{background:var(--blue);color:#fff}
+.secondary{background:#edf1f6;color:var(--ink)}
+button:hover{filter:brightness(.97)}
+.results{display:none;border-color:#d5c18f;background:#fffdf7}
+.score{font-size:1.7rem;font-weight:750;color:var(--blue)}
+.note{font-size:.9rem;color:var(--muted)}
+.small{font-size:.9rem;color:var(--muted)}
+.matchrow{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,260px);gap:12px;align-items:center}
+@media(max-width:560px){.matchrow{grid-template-columns:1fr}.section,.progressbox,.results{padding:17px}}
+footer{text-align:center;color:var(--muted);font-size:.82rem;padding:0 18px 28px}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<div class="eyebrow">English practice · Vocabulary & speaking</div>
+<h1>Memories, time & discussing ideas</h1>
+<p>Practise useful collocations, fixed expressions and phrases for agreeing, disagreeing and adding another point of view. Check your answers and see your score at the end.</p>
+</div></header>
+<main class="wrap">
+<div class="progressbox">
+ <div class="progressrow"><span>Your progress</span><strong id="progressText">0 / 29 answered</strong></div>
+ <div class="track"><div id="progress"></div></div>
+</div>
+
+<section class="section" id="memory">
+<h2>1. Memories</h2>
+<p class="instruction">Complete each sentence with a word from the box. Use each word once.</p>
+<p class="small"><strong>Word box:</strong> vividly · brings · distinctly · earliest · flooding · holds · hazy · vague</p>
+<div id="memoryQs"></div>
+</section>
+
+<section class="section" id="time">
+<h2>2. Time expressions</h2>
+<p class="instruction">Choose the correct alternative to complete each sentence.</p>
+<div id="timeQs"></div>
+</section>
+
+<section class="section" id="discussion">
+<h2>3. Discussing ideas</h2>
+<p class="instruction">Choose the phrase that best completes each response.</p>
+<div id="discussionQs"></div>
+</section>
+
+<section class="section" id="order">
+<h2>4. Responding to an opinion</h2>
+<p class="instruction">Complete each phrase by choosing the words in the correct order.</p>
+<p><strong>Statement:</strong> Social networking sites are a waste of time. People should focus on real friendships.</p>
+<div id="orderQs"></div>
+</section>
+
+<div class="actions">
+<button class="primary" id="checkBtn">Check my answers</button>
+<button class="secondary" id="showBtn">Show answers</button>
+<button class="secondary" id="resetBtn">Try again</button>
+</div>
+<div class="results" id="results" aria-live="polite">
+<div class="score" id="score"></div>
+<p id="resultText"></p>
+<p class="note">Review any incorrect answers above, then select “Try again” to practise once more.</p>
+</div>
+</main>
+<footer>Take your time. Read the whole sentence before choosing an answer.</footer>
+
+<script>
+const memory = [
+ ["He ______ remembered the day his father left.","vividly"],
+ ["When I saw the pictures, the memories came ______ back.","flooding"],
+ ["Just the smell of that perfume ______ back memories of my grandmother.","brings"],
+ ["This place ______ so many memories for me.","holds"],
+ ["One of my ______ memories is of being in my pram and leaning out to reach some strawberries.","earliest"],
+ ["My recollection of those early days when I first moved to the country is rather ______.","hazy"],
+ ["I can only have a very ______ memory of my grandfather. He died when I was young.","vague"],
+ ["I can ______ remember the day we met.","distinctly"]
+];
+const time = [
+ ["When I'm ______ for time at work, I tell my boss, 'You can have it done badly today or done well tomorrow.'",["in a rush","pushed","crushed"],1],
+ ["When you have kids, you never have time for ______, so I get up early and read for thirty minutes.",["itself","the self","yourself"],2],
+ ["I used to finish everything with time to ______, but then I ended up checking it again and again.",["give","spare","relax"],1],
+ ["My favourite way to ______ the time when I'm bored is to hang out with an amusing friend.",["pass","use","overcome"],0],
+ ["I prefer to finish everything ______. The adrenalin of a mini-panic keeps me sharp.",["completely","nearly","just in time"],2],
+ ["If you ever have time ______ in my profession, you should tell no one.",["on your hands","on your mind","on your day"],0],
+ ["When under pressure, I go for a swim. In the water, I feel as if I have all the time in the ______.",["day","world","life"],1]
+];
+const discussion = [
+ ["A: I hate being put on hold when you try to phone a company.<br>B: I know ______.",["how you mean","what you mean","what do you mean"],1],
+ ["A: Ad breaks during TV programmes are the biggest waste of time.<br>B: That's ______.",["truly","true","truth"],1],
+ ["A: In many companies, meetings are a complete waste of time.<br>B: No and yes. It depends who's running them and what they're for.",["In my company, we have meetings about having meetings. Everything could be done faster and more efficiently by email.","That's often the case in my company, too. Although having told that, I think it's better to discuss some things face-to-face."],0],
+ ["A: I hate going through airport security. It's such a waste of time taking off your shoes and everything.<br>B: I'm very much ______ you there. It's a real drag.",["with","for","to"],0],
+ ["A: I hate being put on hold.<br>B: I know what you mean. They should call you back instead of ______ your time.",["losing","wasting","spending"],1],
+ ["A: Ad breaks are a waste of time.<br>B: Yeah. ______, that's how TV companies make their money.",["Minding you","Mind you","You mind"],1],
+ ["A: Meetings are often a waste of time.<br>B: That's often the case. Although ______, I think some things are better discussed face-to-face.",["having told that","having said that","said having that"],1],
+ ["A: Airport security is such a drag.<br>B: That's a good idea. That makes ______ sense.",["the perfect","perfectly","perfect"],2]
+];
+const order = [
+ ["but, looking / at / another / way","But, looking at it another way, don't you think they're a good way to meet people?","But, looking at it another way"],
+ ["having, / said / that","Having said that, those sites are fun!","Having said that"],
+ ["you / mind,","Mind you, they're great if you have friends all over the world.","Mind you"],
+ ["the / hand, / on / other","On the other hand, social networking sites allow us to keep in touch with real friends.","On the other hand"],
+ ["never / that / thought / of / I.","I never thought of that. I'm on Facebook four hours a day.","I never thought of that"],
+ ["mean / I / what / know / you.","You know what I mean. I waste loads of time on those sites.","You know what I mean"]
+];
+function el(tag, cls, html){const n=document.createElement(tag);if(cls)n.className=cls;if(html!==undefined)n.innerHTML=html;return n;}
+const memoryBox=document.getElementById('memoryQs');
+memory.forEach((q,i)=>{
+ const d=el('div','q');d.dataset.group='memory';d.dataset.index=i;
+ d.append(el('div','prompt',`${i+1}. ${q[0].replace('______','<input class="text" aria-label="Answer '+(i+1)+'" autocomplete="off">')}`));
+ d.append(el('div','feedback'));memoryBox.append(d);
+});
+const timeBox=document.getElementById('timeQs');
+time.forEach((q,i)=>{
+ const d=el('div','q');d.dataset.group='time';d.dataset.index=i;
+ d.append(el('div','prompt',`${i+1}. ${q[0]}`));
+ const opts=el('div','options');
+ q[1].forEach((v,j)=>{const lab=el('label','choice',`<input type="radio" name="time${i}" value="${j}">${v}`);opts.append(lab);});
+ d.append(opts,el('div','feedback'));timeBox.append(d);
+});
+const discBox=document.getElementById('discussionQs');
+discussion.forEach((q,i)=>{
+ const d=el('div','q');d.dataset.group='discussion';d.dataset.index=i;
+ d.append(el('div','prompt',`${i+1}. ${q[0]}`));
+ const opts=el('div','options');
+ q[1].forEach((v,j)=>{const lab=el('label','choice',`<input type="radio" name="discussion${i}" value="${j}">${v}`);opts.append(lab);});
+ d.append(opts,el('div','feedback'));discBox.append(d);
+});
+const orderBox=document.getElementById('orderQs');
+order.forEach((q,i)=>{
+ const d=el('div','q');d.dataset.group='order';d.dataset.index=i;
+ d.append(el('div','prompt',`${i+1}. Put these words in the correct order: <em>${q[0]}</em>`));
+ const input=el('input','text');input.type='text';input.placeholder='Write the complete phrase…';input.setAttribute('aria-label','Write phrase '+(i+1));
+ d.append(input,el('div','feedback'));orderBox.append(d);
+});
+function getAnswer(group,i){
+ const data={memory,time,discussion,order}[group][i];
+ if(group==='memory')return data[1];
+ if(group==='time'||group==='discussion')return data[2];
+ return data[2];
+}
+function getUser(group,i,d){
+ if(group==='memory')return d.querySelector('input.text').value.trim().toLowerCase().replace(/[.!?]$/,'');
+ if(group==='time'||group==='discussion'){const v=d.querySelector('input:checked');return v?Number(v.value):null;}
+ return d.querySelector('input.text').value.trim();
+}
+function isCorrect(group,user,answer){
+ if(user===null||user==='')return false;
+ if(group==='memory')return user===answer;
+ if(group==='time'||group==='discussion')return user===answer;
+ return user===answer;
+}
+function check(show=false){
+ let total=0,correct=0,answered=0;
+ document.querySelectorAll('.q').forEach(d=>{
+  const g=d.dataset.group,i=Number(d.dataset.index),ans=getAnswer(g,i),u=getUser(g,i,d),fb=d.querySelector('.feedback');
+  total++;
+  if(u!==null&&u!=='')answered++;
+  const ok=isCorrect(g,u,ans);
+  if(ok)correct++;
+  fb.className='feedback '+(ok?'correct':'incorrect');
+  if(show){fb.innerHTML='Answer: <strong>'+String(ans).replaceAll('<','&lt;')+'</strong>'+(ok?' ✓':'');}
+  else if(u===null||u==='')fb.textContent='Not answered yet.';
+  else fb.textContent=ok?'Correct!':'Not quite. Try again or reveal the answers.';
+ });
+ document.getElementById('progressText').textContent=`${answered} / ${total} answered`;
+ document.getElementById('progress').style.width=(answered/total*100)+'%';
+ const r=document.getElementById('results');r.style.display='block';
+ document.getElementById('score').textContent=`${correct} / ${total}`;
+ document.getElementById('resultText').textContent=show?'The correct answers are shown beside each question.':`You answered ${answered} of ${total} questions. You got ${correct} correct.`;
+ r.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+document.getElementById('checkBtn').addEventListener('click',()=>check(false));
+document.getElementById('showBtn').addEventListener('click',()=>check(true));
+document.getElementById('resetBtn').addEventListener('click',()=>{
+ document.querySelectorAll('input.text').forEach(x=>x.value='');
+ document.querySelectorAll('input[type=radio]').forEach(x=>x.checked=false);
+ document.querySelectorAll('#orderQs input.text').forEach(x=>x.value='');
+ document.querySelectorAll('.feedback').forEach(x=>{x.textContent='';x.className='feedback';});
+ document.getElementById('results').style.display='none';
+ document.getElementById('progressText').textContent='0 / 29 answered';
+ document.getElementById('progress').style.width='0%';
+ window.scrollTo({top:0,behavior:'smooth'});
+});
+document.addEventListener('input',updateProgress);
+document.addEventListener('change',updateProgress);
+function updateProgress(){
+ let n=0,total=document.querySelectorAll('.q').length;
+ document.querySelectorAll('.q').forEach(d=>{const g=d.dataset.group,i=Number(d.dataset.index),u=getUser(g,i,d);if(u!==null&&u!=='')n++;});
+ document.getElementById('progressText').textContent=`${n} / ${total} answered`;
+ document.getElementById('progress').style.width=(n/total*100)+'%';
+}
+</script>
+</body>
+</html>
